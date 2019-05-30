@@ -1,10 +1,24 @@
-
+const express = require('express');
+const router = express.Router();
 const userQueries = require("../db/queries.users.js");
 const passport = require("passport");
 
+
+
 module.exports = {
   signUp(req, res, next){
-    res.render("users/sign_up");
+    res.render("user/signup");
+
+    const sgMail = require('@sendgrid/mail');
+        sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+        const msg = {
+        to: 'test@example.com',
+        from: 'test@example.com',
+        subject: 'Sending with Twilio SendGrid is Fun',
+        text: 'and easy to do anywhere, even with Node.js',
+        html: '<strong>and easy to do anywhere, even with Node.js</strong>',
+        };
+        sgMail.send(msg);
   },
 
   create(req, res, next){
@@ -61,5 +75,6 @@ show(req, res, next){
       res.render("users/show", {...result});
     }
   });
-}
+},
+
 }
