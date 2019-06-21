@@ -2,40 +2,41 @@
 const userQueries = require("../db/queries.users.js");
 const passport = require("passport");
 const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 module.exports = {
     signUp(req, res, next) {
         res.render("users/signup");
-
-        sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-        const msg = {
-        to: 'colsoncrim1@gmail.com',
-        from: 'test@example.com',
-        subject: 'Sending with Twilio SendGrid is Fun',
-        text: 'and easy to do anywhere, even with Node.js',
-        html: '<strong>and easy to do anywhere, even with Node.js</strong>',
-        };
-        sgMail.send(msg);
     },
     create(req, res, next) {
-        //#1
         let newUser = {
             username: req.body.username,
             email: req.body.email,
             password: req.body.password,
             passwordConfirmation: req.body.passwordConfirmation
         };
-        // #2
         userQueries.createUser(newUser, (err, user) => {
             if (err) {
                 req.flash("error", err);
                 res.redirect("/users/signup");
             } else {
 
-                // #3
                 passport.authenticate("local")(req, res, () => {
                     req.flash("notice", "Welcome!");
                     res.redirect("/");
+
+                    const sgMail = require('@sendgrid/mail');
+
+                    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+                    const msg = {
+                        to: 'colsoncrim1@gmail.com',
+                        from: 'test@example.com',
+                        subject: 'Welcome to Blocipedia',
+                        text: 'Thanks for signing up!.',
+                        html: '<strong>Sending with Twilio SendGrid is Fun</strong>',
+                    };
+                    sgMail.send(msg);
                 })
             }
         });
